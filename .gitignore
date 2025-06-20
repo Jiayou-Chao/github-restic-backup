@@ -1,0 +1,74 @@
+# ===========================
+# Sensitive files and secrets
+# ===========================
+.github_pat
+.restic_pass
+*.secret
+.env
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+*.credentials
+*.token
+
+# ===========================
+# Restic cache and backup cache
+# ===========================
+# User-level restic cache (for reference, not local to repo)
+# ~/.cache/restic/
+# Local restic cache (if script generates one)
+restic-cache/
+.cache/restic/
+.cache/
+tmp/restic-cache/
+
+# ===========================
+# Logs, temporary files, and backup artifacts
+# ===========================
+*.log
+*.bak
+*.tmp
+*.swp
+*.swo
+*.old
+*.orig
+*.backup
+*.~*
+*.tmp.*
+*.temp
+*.lock
+
+# ===========================
+# OS-specific files
+# ===========================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+Icon?
+._*
+
+# ===========================
+# Editor and IDE files
+# ===========================
+.vscode/
+.idea/
+*.code-workspace
+*.sublime-workspace
+*.sublime-project
+*.iml
+
+# ===========================
+# Miscellaneous
+# ===========================
+# Node, Python, and other common folders (if present)
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.*
+
+# End of .gitignore
