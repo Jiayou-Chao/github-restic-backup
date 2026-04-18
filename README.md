@@ -128,12 +128,14 @@ They are excluded by `.gitignore` by default.
 GITHUB_USER=your-github-username
 GITHUB_TOKEN_FILE=$HOME/.github_pat
 MIRRORS_DIR=$HOME/github-mirrors
-RESTIC_REPO=rclone:myremote:restic-github-backup
+RESTIC_REPOSITORY=rclone:myremote:restic-github-backup
 RESTIC_PASSWORD_FILE=$HOME/.restic_pass
 RESTIC_KEEP_DAILY=7
 RESTIC_KEEP_WEEKLY=4
 RESTIC_KEEP_MONTHLY=6
+RESTIC_KEEP_YEARLY=2
 PARALLEL_JOBS=4
+# RESTIC_CHECK_READ_DATA_SUBSET=5G
 ```
 
 ---

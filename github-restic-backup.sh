@@ -37,15 +37,17 @@ fi
 # : "${GITHUB_USER:=your-github-username}"
 # : "${GITHUB_TOKEN_FILE:=$HOME/.github_pat}"
 # : "${MIRRORS_DIR:=$HOME/github-mirrors}"
-# : "${RESTIC_REPO:=rclone:myremote:restic-github-backup}"
+# : "${RESTIC_REPOSITORY:=rclone:myremote:restic-github-backup}"
 # : "${RESTIC_PASSWORD_FILE:=$HOME/.restic_pass}"
 # : "${RESTIC_KEEP_DAILY:=7}"
 # : "${RESTIC_KEEP_WEEKLY:=4}"
 # : "${RESTIC_KEEP_MONTHLY:=6}"
+# : "${RESTIC_KEEP_YEARLY:=2}"
 # : "${PARALLEL_JOBS:=4}"
+# : "${RESTIC_CHECK_READ_DATA_SUBSET:=5G}"
 
 # Check for required variables
-required_vars=(GITHUB_USER GITHUB_TOKEN_FILE MIRRORS_DIR RESTIC_REPO RESTIC_PASSWORD_FILE RESTIC_KEEP_DAILY RESTIC_KEEP_WEEKLY RESTIC_KEEP_MONTHLY PARALLEL_JOBS)
+required_vars=(GITHUB_USER GITHUB_TOKEN_FILE MIRRORS_DIR RESTIC_REPOSITORY RESTIC_PASSWORD_FILE RESTIC_KEEP_DAILY RESTIC_KEEP_WEEKLY RESTIC_KEEP_MONTHLY RESTIC_KEEP_YEARLY PARALLEL_JOBS)
 for var in "${required_vars[@]}"; do
   if [[ -z "${!var:-}" ]]; then
     echo "ERROR: Required environment variable '$var' is not set. Please set it in your .env file."
@@ -144,11 +146,12 @@ echo "All repositories are up to date."
 #####################################
 # Restic backup                     #
 #####################################
-echo "Starting restic backup to '$RESTIC_REPO'..."
+echo "Starting restic backup to '$RESTIC_REPOSITORY'..."
 
+export RESTIC_REPOSITORY
 export RESTIC_PASSWORD_FILE
 
-restic -r "$RESTIC_REPO" backup "$MIRRORS_DIR" \
+restic backup "$MIRRORS_DIR" \
     --tag github-backup \
     --verbose
 
@@ -157,15 +160,25 @@ echo "Restic backup completed."
 #####################################
 # Restic prune                      #
 #####################################
-echo "Pruning old restic snapshots (daily: $RESTIC_KEEP_DAILY, weekly: $RESTIC_KEEP_WEEKLY, monthly: $RESTIC_KEEP_MONTHLY)..."
+echo "Pruning old restic snapshots (daily: $RESTIC_KEEP_DAILY, weekly: $RESTIC_KEEP_WEEKLY, monthly: $RESTIC_KEEP_MONTHLY, yearly: $RESTIC_KEEP_YEARLY)..."
 
-restic -r "$RESTIC_REPO" forget \
+restic forget \
     --keep-daily "$RESTIC_KEEP_DAILY" \
     --keep-weekly "$RESTIC_KEEP_WEEKLY" \
     --keep-monthly "$RESTIC_KEEP_MONTHLY" \
+    --keep-yearly "$RESTIC_KEEP_YEARLY" \
     --prune
 
 echo "Restic prune completed."
+
+#####################################
+# Restic check                      #
+#####################################
+if [[ -n "${RESTIC_CHECK_READ_DATA_SUBSET:-}" ]]; then
+    echo "Checking restic repository for data corruption (subset: $RESTIC_CHECK_READ_DATA_SUBSET)..."
+    restic check --read-data-subset "$RESTIC_CHECK_READ_DATA_SUBSET"
+    echo "Restic check completed."
+fi
 
 #####################################
 # Done                              #
